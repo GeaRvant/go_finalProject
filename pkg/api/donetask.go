@@ -4,10 +4,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/GeaRvant/go_final_project/pkg/db"
+	"github.com/GeaRvant/go_finalProject/pkg/db"
 )
 
 func taskDoneHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
 
 	id := r.URL.Query().Get("id")
 	if id == "" {
@@ -17,14 +22,14 @@ func taskDoneHandler(w http.ResponseWriter, r *http.Request) {
 
 	task, err := db.GetTask(id)
 	if err != nil {
-		writeError(w, err.Error(), http.StatusBadRequest)
+		writeError(w, "Task not found", http.StatusNotFound)
 		return
 	}
 
 	if task.Repeat == "" {
 		err = db.DeleteTask(id)
 		if err != nil {
-			writeError(w, err.Error(), http.StatusBadRequest)
+			writeError(w, "Task not found", http.StatusNotFound)
 			return
 		}
 
@@ -40,7 +45,7 @@ func taskDoneHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = db.UpdateDate(next, id)
 	if err != nil {
-		writeError(w, err.Error(), http.StatusBadRequest)
+		writeError(w, "Task not found", http.StatusNotFound)
 		return
 	}
 
@@ -48,6 +53,11 @@ func taskDoneHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodDelete {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
 
 	id := r.URL.Query().Get("id")
 	if id == "" {
@@ -57,7 +67,7 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := db.DeleteTask(id)
 	if err != nil {
-		writeError(w, err.Error(), http.StatusBadRequest)
+		writeError(w, "Task not found", http.StatusNotFound)
 		return
 	}
 

@@ -1,9 +1,8 @@
-module go_finalProject
+module github.com/GeaRvant/go_finalProject
 
 go 1.25.1
 
 require (
-	github.com/GeaRvant/go_final_project v0.0.0-20260307104831-7d27fa09d662
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/stretchr/testify v1.11.1
 	modernc.org/sqlite v1.46.1
@@ -24,3 +23,5 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
+
+replace github.com/GeaRvant/go_finalProject => ./

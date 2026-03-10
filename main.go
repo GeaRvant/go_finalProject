@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/GeaRvant/go_final_project/pkg/api"
-	"github.com/GeaRvant/go_final_project/pkg/db"
-	"github.com/GeaRvant/go_final_project/pkg/server"
+	"github.com/GeaRvant/go_finalProject/pkg/api"
+	"github.com/GeaRvant/go_finalProject/pkg/db"
+	"github.com/GeaRvant/go_finalProject/pkg/server"
 )
 
 func main() {
@@ -18,6 +18,12 @@ func main() {
 		fmt.Printf("Error initializing database: %v\n", err)
 		os.Exit(1)
 	}
+
+	defer func() {
+		if err := db.CloseDB(); err != nil {
+			fmt.Println("Error closing database:", err)
+		}
+	}()
 
 	api.Init()
 

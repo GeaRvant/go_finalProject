@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/GeaRvant/go_final_project/pkg/db"
+	"github.com/GeaRvant/go_finalProject/pkg/db"
 )
 
 func checkDate(task *db.Task) error {
@@ -42,16 +42,24 @@ func checkDate(task *db.Task) error {
 
 func writeJson(w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	json.NewEncoder(w).Encode(data)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		http.Error(w, "Failed to encode JSON", http.StatusInternalServerError)
+	}
 }
 
 func writeError(w http.ResponseWriter, message string, status int) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(map[string]string{"error": message})
+	_ = json.NewEncoder(w).Encode(map[string]string{"error": message})
 }
 
 func addTaskHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	var task db.Task
 
 	err := json.NewDecoder(r.Body).Decode(&task)
@@ -72,7 +80,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := db.AddTask(&task)
 	if err != nil {
-		writeError(w, err.Error(), http.StatusBadRequest)
+		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

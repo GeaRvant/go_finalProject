@@ -5,10 +5,24 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/GeaRvant/go_final_project/pkg/db"
+	"github.com/GeaRvant/go_finalProject/pkg/db"
 )
 
+type UpdateTaskRequest struct {
+	ID      string `json:"id"`
+	Date    string `json:"date"`
+	Title   string `json:"title"`
+	Comment string `json:"comment"`
+	Repeat  string `json:"repeat"`
+}
+
 func getTaskHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	id := r.URL.Query().Get("id")
 	if id == "" {
 		writeError(w, "ID is required", http.StatusBadRequest)
@@ -17,7 +31,7 @@ func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	task, err := db.GetTask(id)
 	if err != nil {
-		writeError(w, "Task not found", http.StatusBadRequest)
+		writeError(w, "Task not found", http.StatusNotFound)
 		return
 	}
 
@@ -31,13 +45,13 @@ func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		ID      string `json:"id"`
-		Date    string `json:"date"`
-		Title   string `json:"title"`
-		Comment string `json:"comment"`
-		Repeat  string `json:"repeat"`
+
+	if r.Method != http.MethodPut {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
 	}
+
+	var req UpdateTaskRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -76,7 +90,7 @@ func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = db.UpdateTask(&task)
 	if err != nil {
-		writeError(w, "Task not found", http.StatusBadRequest)
+		writeError(w, "Task not found", http.StatusNotFound)
 		return
 	}
 
